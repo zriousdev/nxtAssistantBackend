@@ -24,6 +24,10 @@ if (!mongoUrl) {
 mongoose.connect(mongoUrl)
 .then(() => console.log('mongo connected.')).catch(err => console.error('mongo connection error', err));
 
+mid.get('/',(res,req)=>{
+  res.status(200).send('run');
+});
+
 mid.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3001;
