@@ -24,7 +24,7 @@ if (!mongoUrl) {
 mongoose.connect(mongoUrl)
 .then(() => console.log('mongo connected.')).catch(err => console.error('mongo connection error', err));
 
-mid.get('/',(res,req)=>{
+mid.get('/',(req,res)=>{
   res.status(200).send('run');
 });
 
