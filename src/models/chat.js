@@ -7,6 +7,12 @@ const chatSchema = new mongoose.Schema(
       required: true,
       index:    true,  
     },
+    sessionId: {
+      type:     String,
+      required: true,
+      index:    true,
+      trim:     true,
+    },
     sender: {
       type:     String,
       enum:     ['user', 'assistant'],

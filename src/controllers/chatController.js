@@ -1,5 +1,7 @@
 const Chat = require('../models/chat');
 
+const newSessionId = () => `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
 const _dummyReply = (message) => {
   const m = message.toLowerCase();
 
@@ -35,6 +37,7 @@ const sendMessage = async (req, res) => {
   try {
     const { uid } = req.user;     
     const { message } = req.body;
+    const sessionId = req.body.sessionId?.toString().trim() || newSessionId();
 
     if (!message || message.trim().length === 0) {
       return res.status(400).json({
@@ -45,6 +48,7 @@ const sendMessage = async (req, res) => {
 
     await Chat.create({
       userId:  uid,
+      sessionId,
       sender:  'user',
       message: message.trim(),
     });
@@ -53,6 +57,7 @@ const sendMessage = async (req, res) => {
 
     await Chat.create({
       userId:  uid,
+      sessionId,
       sender:  'assistant',
       message: replyText,
     });
@@ -60,6 +65,7 @@ const sendMessage = async (req, res) => {
     return res.status(200).json({
       status: 'success',
       reply:  replyText,
+      sessionId,
     });
   } catch (error) {
     console.error('Chat sendMessage error:', error);
