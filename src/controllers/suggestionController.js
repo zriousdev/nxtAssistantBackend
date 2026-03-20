@@ -51,16 +51,59 @@ const CATALOGUE = [
   { id: 50, title: 'Report suspicious activity',  description: 'Flag unauthorised transactions or phishing attempts' },
 ];
 
+const CATEGORY_KEYWORDS = {
+  Offers: [
+    'offer', 'deal', 'promo', 'cashback', 'reward', 'referral',
+    'hdfc', 'icici', 'axis', 'surcharge', 'fuel', 'zero-fee',
+    'free of charge', 'promotion',
+  ],
+  Payments: [
+    'payment', 'pay ', 'invoice', 'upi', 'gst', 'gstin',
+    'transaction', 'settlement', 'bulk', 'receipt', 'bill',
+    'electricity', 'recharge', 'broadband', 'internet', 'water',
+    'gas', 'vendor', 'compliance',
+  ],
+  Cards: [
+    'card', 'credit', 'debit', 'visa', 'mastercard', 'rupay', 'amex',
+    'activate', 'activation', 'limit',
+  ],
+  Support: [
+    'sign up', 'register', 'registration', 'kyc', 'otp', 'support',
+    'contact', 'help', 'password', 'mobile number', 'phone number',
+    'blocked', 'suspended', 'download', 'export', 'history',
+  ],
+  Security: [
+    'secure', 'security', 'fraud', 'suspicious', 'mismatch',
+    'zero tolerance', 'two-factor', 'authentication', 'phishing',
+    'unauthorised', 'unauthorized', 'protected',
+  ],
+};
+
+const matchesCategory = (item, category) => {
+  if (!category || category === 'All') return true;
+
+  const keywords = CATEGORY_KEYWORDS[category];
+  if (!keywords) return true;
+
+  const combined = `${item.title} ${item.description}`.toLowerCase();
+  return keywords.some((keyword) => combined.includes(keyword));
+};
+
 const getSuggestions = (req, res) => {
   try {
+    const category = req.query.category?.toString().trim() || 'All';
     const page  = Math.max(1, parseInt(req.query.page,  10) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
 
-    const total      = CATALOGUE.length;
+    const filteredCatalogue = CATALOGUE.filter((item) =>
+      matchesCategory(item, category)
+    );
+
+    const total      = filteredCatalogue.length;
     const totalPages = Math.ceil(total / limit);
     const start      = (page - 1) * limit;
     const end        = Math.min(start + limit, total);
-    const data       = CATALOGUE.slice(start, end);
+    const data       = filteredCatalogue.slice(start, end);
 
     return res.status(200).json({
       status: 'success',
